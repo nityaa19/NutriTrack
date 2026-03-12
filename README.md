@@ -1,3 +1,4 @@
+
 # NutriTrack - AI-Powered Nutrition Management
 
 NutriTrack is a modern, personalized health and nutrition tracking application. It leverages AI to provide deep insights into your dietary habits, helping you reach your fitness goals faster.
@@ -56,4 +57,6 @@ Follow these steps exactly in your terminal:
    *(Note: The terminal won't show characters while you paste/type the password, just press Enter when done)*
 
 ---
-*Note: Ensure you have your Firebase configuration and any necessary environment variables set up in your hosting environment.*
+*Note: Ensure you have your Firebase configuration and any necessary environment variables set up in your hosting environmet
+# NutriTrack
+a web base service to track the calories
