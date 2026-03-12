@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * NUTRITION TRACKER SECURITY RULES
+     * 
+     * CORE PHILOSOPHY:
+     * This ruleset enforces a strict User-Ownership model. Each user has their own isolated data tree
+     * under /userProfiles/{userId}. All health metrics, food logs, and AI reports are strictly private
+     * to the authenticated user.
+     * 
+     * DATA STRUCTURE:
+     * - /userProfiles/{userId}: Root profile containing personal health metrics.
+     * - /userProfiles/{userId}/foodLogs/{id}: Daily consumption records.
+     * - /userProfiles/{userId}/customFoodItems/{id}: User-defined food nutrition data.
+     * - /userProfiles/{userId}/aiReports/{id}: Periodic nutritional analysis.
+     * - /globalFoodItems/{id}: A top-level read-only library of standard foods.
+     * 
+     * KEY SECURITY DECISIONS:
+     * 1. Authorization Independence: Critical ownership IDs (userId, creatorId) are denormalized onto 
+     *    documents to allow for fast, direct security checks without expensive get() lookups.
+     * 2. Structural Segregation: Public food items are separated from private custom items to 
+     *    ensure list operations never leak private data.
+     * 3. Relational Integrity: On document creation, rules enforce that the internal ownership field 
+     *    matches the path ID, and these fields are made immutable on update.
+     */
+
+    // --- HELPER FUNCTIONS ---
+
+    /** Checks if the user is authenticated. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user's UID matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks ownership and ensures the document exists for update/delete operations. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for the root User Profile containing health goals and personal metrics.
+     * @path /userProfiles/{userId}
+     * @allow (create) User 'abc' creates a profile with ID 'abc'.
+     * @deny (create) User 'abc' attempts to create a profile with ID 'xyz'.
+     * @principle Path-based ownership and relational integrity for root user documents.
+     */
+    match /userProfiles/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Records of food consumption. Nested under the user for strict privacy.
+       * @path /userProfiles/{userId}/foodLogs/{foodLogId}
+       * @allow (list) User 'abc' fetches their own meal history.
+       * @deny (get) User 'abc' tries to view a log entry belonging to user 'def'.
+       * @principle Enforces that logs contain a valid, immutable userId matching the parent path.
+       */
+      match /foodLogs/{foodLogId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description User-created custom food items. Private to the creator.
+       * @path /userProfiles/{userId}/customFoodItems/{foodItemId}
+       * @allow (create) User 'abc' saves a custom 'Homemade Protein Bar'.
+       * @deny (update) User 'abc' tries to change the creatorId of their custom food.
+       * @principle Uses denormalized 'creatorId' to verify ownership of custom entries.
+       */
+      match /customFoodItems/{foodItemId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.creatorId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.creatorId == resource.data.creatorId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description AI-generated nutritional reports for the user.
+       * @path /userProfiles/{userId}/aiReports/{reportId}
+       * @allow (get) User 'abc' views their weekly progress report.
+       * @deny (create) User 'abc' attempts to manually spoof an AI report (Access restricted to system/owner).
+       * @principle Reports are private to the owner. Update is disabled to ensure report integrity.
+       */
+      match /aiReports/{reportId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if false; // Reports should be immutable once generated.
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Publicly accessible database of standard food items.
+     * @path /globalFoodItems/{foodItemId}
+     * @allow (list) Any signed-in or anonymous user browses the common food library.
+     * @deny (create) Any user attempts to add a new global food item.
+     * @principle Read-only public collection for shared static data.
+     */
+    match /globalFoodItems/{foodItemId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // Global items are managed by system/admin only.
+    }
+  }
+}

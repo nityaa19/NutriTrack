@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-health",
+      "description": "A fresh bowl of salad with vibrant vegetables representing healthy living.",
+      "imageUrl": "https://picsum.photos/seed/health1/1200/600",
+      "imageHint": "healthy food"
+    },
+    {
+      "id": "food-prep",
+      "description": "Person preparing a balanced meal in a bright kitchen.",
+      "imageUrl": "https://picsum.photos/seed/prep/800/600",
+      "imageHint": "meal prep"
+    }
+  ]
+}

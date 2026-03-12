@@ -1,0 +1,370 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Stores user-specific personal information, health metrics, and customizable dietary goals.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name for personalization."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's registered email address for notifications and report delivery.",
+          "format": "email"
+        },
+        "heightCm": {
+          "type": "number",
+          "description": "The user's height in centimeters."
+        },
+        "weightKg": {
+          "type": "number",
+          "description": "The user's current weight in kilograms."
+        },
+        "age": {
+          "type": "number",
+          "description": "The user's current age."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "The user's date of birth.",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "description": "The user's biological gender (e.g., 'male', 'female'), used for BMR calculations."
+        },
+        "dailyStepsGoal": {
+          "type": "number",
+          "description": "The user's target number of steps to achieve daily."
+        },
+        "weeklyGymActivityHours": {
+          "type": "number",
+          "description": "The total number of hours the user spends on gym activities per week."
+        },
+        "fitnessGoal": {
+          "type": "string",
+          "description": "The user's primary fitness objective (e.g., 'lose weight', 'maintain weight', 'gain weight', 'muscle gain')."
+        },
+        "targetCalories": {
+          "type": "number",
+          "description": "The user's custom daily calorie intake target."
+        },
+        "targetCarbsGrams": {
+          "type": "number",
+          "description": "The user's custom daily carbohydrate target in grams."
+        },
+        "targetProteinGrams": {
+          "type": "number",
+          "description": "The user's custom daily protein target in grams."
+        },
+        "targetFatGrams": {
+          "type": "number",
+          "description": "The user's custom daily fat target in grams."
+        },
+        "targetFiberGrams": {
+          "type": "number",
+          "description": "The user's custom daily fiber target in grams."
+        },
+        "targetWaterLiters": {
+          "type": "number",
+          "description": "The user's custom daily water intake target in liters."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "heightCm",
+        "weightKg",
+        "age",
+        "gender",
+        "fitnessGoal",
+        "createdAt"
+      ]
+    },
+    "FoodItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FoodItem",
+      "type": "object",
+      "description": "Represents a single food item with its detailed nutritional information, which can be pre-defined or user-customized.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FoodItem entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The common name of the food item (e.g., 'Apple', 'Chicken Breast')."
+        },
+        "description": {
+          "type": "string",
+          "description": "An optional detailed description of the food item."
+        },
+        "caloriesPer100g": {
+          "type": "number",
+          "description": "The caloric content of the food item per 100 grams."
+        },
+        "carbsPer100g": {
+          "type": "number",
+          "description": "The carbohydrate content of the food item per 100 grams."
+        },
+        "proteinPer100g": {
+          "type": "number",
+          "description": "The protein content of the food item per 100 grams."
+        },
+        "fatPer100g": {
+          "type": "number",
+          "description": "The fat content of the food item per 100 grams."
+        },
+        "fiberPer100g": {
+          "type": "number",
+          "description": "The fiber content of the food item per 100 grams."
+        },
+        "standardServingSizeGrams": {
+          "type": "number",
+          "description": "A common or standard serving size for the food item in grams, for user convenience."
+        },
+        "isCustom": {
+          "type": "boolean",
+          "description": "A flag indicating if this food item was customized or created by a user."
+        },
+        "creatorId": {
+          "type": "string",
+          "description": "Reference to UserProfile if this food item is user-customized."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "caloriesPer100g",
+        "carbsPer100g",
+        "proteinPer100g",
+        "fatPer100g",
+        "fiberPer100g",
+        "isCustom"
+      ]
+    },
+    "FoodLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FoodLog",
+      "type": "object",
+      "description": "Records a single instance of a user consuming a specific food item, including quantity, meal type, and timestamp.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FoodLog entry."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who logged this food item."
+        },
+        "foodItemId": {
+          "type": "string",
+          "description": "Reference to the FoodItem that was consumed."
+        },
+        "quantityGrams": {
+          "type": "number",
+          "description": "The quantity of the food item consumed, in grams."
+        },
+        "mealType": {
+          "type": "string",
+          "description": "The category of the meal, e.g., 'breakfast', 'lunch', 'evening snacks', 'dinner', 'something extra'."
+        },
+        "consumptionDateTime": {
+          "type": "string",
+          "description": "The exact date and time when the food item was consumed.",
+          "format": "date-time"
+        },
+        "calculatedCalories": {
+          "type": "number",
+          "description": "The total calories calculated for this specific logged quantity."
+        },
+        "calculatedCarbsGrams": {
+          "type": "number",
+          "description": "The total carbohydrates in grams calculated for this specific logged quantity."
+        },
+        "calculatedProteinGrams": {
+          "type": "number",
+          "description": "The total protein in grams calculated for this specific logged quantity."
+        },
+        "calculatedFatGrams": {
+          "type": "number",
+          "description": "The total fat in grams calculated for this specific logged quantity."
+        },
+        "calculatedFiberGrams": {
+          "type": "number",
+          "description": "The total fiber in grams calculated for this specific logged quantity."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "foodItemId",
+        "quantityGrams",
+        "mealType",
+        "consumptionDateTime",
+        "calculatedCalories",
+        "calculatedCarbsGrams",
+        "calculatedProteinGrams",
+        "calculatedFatGrams",
+        "calculatedFiberGrams"
+      ]
+    },
+    "AIReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AIReport",
+      "type": "object",
+      "description": "Stores the weekly AI-generated reports with summaries, trends, and dietary suggestions for users.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AIReport entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile for whom the report was generated."
+        },
+        "generationDate": {
+          "type": "string",
+          "description": "The date when the AI report was generated.",
+          "format": "date"
+        },
+        "reportContent": {
+          "type": "string",
+          "description": "The full text content of the AI-generated weekly nutritional report."
+        },
+        "sentToEmail": {
+          "type": "boolean",
+          "description": "A flag indicating whether the report was successfully sent to the user's email address."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "generationDate",
+        "reportContent",
+        "sentToEmail"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user-specific personal information, health metrics, and customizable dietary goals. Access is strictly limited to the authenticated user whose UID matches {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to `request.auth.uid`."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/globalFoodItems/{foodItemId}",
+        "definition": {
+          "entityName": "FoodItem",
+          "schema": {
+            "$ref": "#/backend/entities/FoodItem"
+          },
+          "description": "Contains pre-defined, generic food items and their nutritional data. These items are publicly readable by all users. They have 'isCustom' set to false.",
+          "params": [
+            {
+              "name": "foodItemId",
+              "description": "The unique identifier for a global food item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/customFoodItems/{foodItemId}",
+        "definition": {
+          "entityName": "FoodItem",
+          "schema": {
+            "$ref": "#/backend/entities/FoodItem"
+          },
+          "description": "Stores food items that have been customized or created by a specific user. Access is limited to the owner ({userId}). Includes denormalized 'creatorId' field for authorization independence, which must match {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns this custom food item."
+            },
+            {
+              "name": "foodItemId",
+              "description": "The unique identifier for this custom food item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/foodLogs/{foodLogId}",
+        "definition": {
+          "entityName": "FoodLog",
+          "schema": {
+            "$ref": "#/backend/entities/FoodLog"
+          },
+          "description": "Records individual food consumption entries for a user. Access is strictly limited to the owner ({userId}). Includes denormalized 'userId' field for authorization independence, which must match {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who logged this food entry."
+            },
+            {
+              "name": "foodLogId",
+              "description": "The unique identifier for a specific food log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/aiReports/{reportId}",
+        "definition": {
+          "entityName": "AIReport",
+          "schema": {
+            "$ref": "#/backend/entities/AIReport"
+          },
+          "description": "Stores weekly AI-generated reports for a specific user. Access is strictly limited to the owner ({userId}). Includes denormalized 'userId' field for authorization independence, which must match {userId}.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user for whom the report was generated."
+            },
+            {
+              "name": "reportId",
+              "description": "The unique identifier for a specific AI report."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
